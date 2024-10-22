@@ -112,7 +112,7 @@ main {
 /***********************/
 /* Calculator buttons  */
 /***********************/
-.calculator-buttons{
+.calculator-buttons {
     flex-wrap: wrap;
     gap: 10px;
 }
@@ -120,7 +120,8 @@ main {
 button {
     color: #fff;
     background-color: #333;
-    font-size: 24px;
+    font-size: 20px;
+    font-weight: 400;
     border-radius: 50%;
     height:60px;
     width: 60px;
@@ -133,7 +134,7 @@ button.double {
 }
 
 button.operator {
-    background-color:#8f5d01;
+    background-color:#c49133;
 }
 
 button.other-operator {
