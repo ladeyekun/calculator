@@ -15,28 +15,53 @@ function listen(event, selector, callback) {
 const numberBtns = selectAll('.number');
 const operatorBtns = selectAll('.operator');
 const display = select('.calculator-display p');
-let lastOperator = '';
-let lastNumber = '';
+const operators = ['+', '-', '/', '*'];
+let memoryNumber = 0;
+let memoryOperator = '';
+let operatorMonitor = 0;
+let lastChar = '';
 
 numberBtns.forEach(numberBtn => {
     numberBtn.addEventListener('click', (clickEvent) => {
-        display.innerText = 
-            inputNumber(display.innerText, clickEvent.target.innerText);
+        inputNumber(display, clickEvent.target.innerText);
     });
 });
 
 operatorBtns.forEach(operatorBtn => {
     operatorBtn.addEventListener('click', (clickEvent) => {
-        display.innerText = 
-            inputOperator(display.innerText, clickEvent.target.innerText);
-            lastOperator = clickEvent.target.innerText;
-            lastNumber = display.innerText;
-            console.log(`Last Number = ${lastNumber}, Last operator= ${lastOperator}`);
+        inputOperator(display, clickEvent.target.innerText);
+            //lastOperator = clickEvent.target.innerText;
+            //lastNumber = display.innerText;
+            //console.log(`Last Number = ${lastNumber}, Last operator= ${lastOperator}`);
     });
 });
 
-function inputNumber(display, input) {
-    if (display === '0' || display === 'Infinity') {
+function inputNumber(selector, input) {
+    let display = selector.innerText;
+    lastChar = display.substring(display.length - 1);
+    if (operators.includes(lastChar)){
+        let result = eval(display.substring(0, lastChar + 1));
+        console.log(`display=${display}`);
+        console.log(`last Char=${lastChar}, Eval=${display.substring(0, lastChar + 1)}`);
+        console.log(`result ${display.substring(0, lastChar + 1)}=${result}`);
+    }
+
+    if (operatorMonitor === 1) {
+        operatorMonitor = 0;
+        display = '';
+    }
+
+    if (display.length > 9) return;
+
+    /*
+    if (operatorMonitor === 1) {
+        memoryNumber = display;
+        display = '';
+        operatorMonitor = 0;
+    }
+    */
+
+    if (display === '0' || display === 'Infinity' || display === 'NaN') {
         display = '';
     }
 
@@ -47,31 +72,67 @@ function inputNumber(display, input) {
     }
 
     display += input;
-    return display;
+    selector.innerText = display;
 }
 
-function inputOperator(display, input) {
+function inputOperator(selector, input) {
+    let display = selector.innerText;
+
     switch (input) {
         case '=':
-            return eval(display);
+            lastChar = display.substring(display.length - 1);
+            if (! operators.includes(lastChar)){
+                display = eval(display);
+                operatorMonitor = 1;
+            }
+            //display += input;
             break;
 
+        case '%':
+            lastChar = display.substring(display.length - 1);
+            if (! operators.includes(lastChar)){
+                display = eval(display) / 100;
+                operatorMonitor = 1;
+            }
+            //display += input;
+            break;
+    
         case 'AC':
-            return '0';
+            memoryNumber = 0;
+            memoryOperator = '';
+            operatorMonitor = 0;
+            display = '0';
             break;
 
         case 'DEL':
-            display = display.slice(0, display.length - 1);
-            return display === '' ? '0' : display;
+            display = display.length > 1 ? 
+                display.slice(0, display.length - 1) : '0';
             break;
 
         default:
-            return display += input;
+            lastChar = display.substring(display.length - 1);
+            if (operators.includes(lastChar)){
+                display = display.substring(0, display.length - 1);
+            } else {
+                display = eval(display);
+            }
+            if (operatorMonitor === 1) operatorMonitor = 0;
+            display += input;
+            break;
     }
+    selector.innerText = display;
+}
+
+function computeDisplayResult(display) {
+    return eval(display);
 }
 
 function isDecimalPointPresent(display) {
     return display.indexOf('.') !== -1 ? true : false;
 }
 
-console.log(numberBtns);
+function clearDisplay(selector) {
+    selector.innerText = '0';
+}
+
+
